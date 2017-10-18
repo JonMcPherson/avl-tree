@@ -36,46 +36,35 @@ class AVLTree[A](implicit val ordering: Ordering[A]) extends mutable.SortedSet[A
 
   override def isEmpty: Boolean = root == null
 
-  def findNode(key: A): AVLNode = {
+  def findNode(key: A): Option[AVLNode] = {
     var node = root
     while (node != null) {
       val cmp = ordering.compare(key, node.key)
-      if (cmp == 0) return node
+      if (cmp == 0) return Some(node)
       node = node.matchNextChild(cmp)
     }
-    node
+    None
   }
 
-  override def min[B >: A](implicit cmp: Ordering[B]): A = {
+  override def min[B >: A](implicit cmp: Ordering[B]): A = minNode().key
+
+  def minNode(): AVLNode = {
     if (root == null) throw new UnsupportedOperationException("empty tree")
     var node = root
     while (node.left != null) node = node.left
-    node.key
-  }
-
-  def minNode(): AVLNode = {
-    var node = root
-    if (node == null) return null
-    while (node.left != null) node = node.left
     node
   }
 
-  override def max[B >: A](implicit cmp: Ordering[B]): A = {
+  override def max[B >: A](implicit cmp: Ordering[B]): A = maxNode().key
+
+  def maxNode(): AVLNode = {
     if (root == null) throw new UnsupportedOperationException("empty tree")
     var node = root
     while (node.right != null) node = node.right
-    node.key
-  }
-
-  def maxNode(): AVLNode = {
-    var node = root
-    if (node != null) {
-      while (node.right != null) node = node.right
-    }
     node
   }
 
-  def next(node: AVLNode): AVLNode = {
+  def next(node: AVLNode): Option[AVLNode] = {
     var successor = node
     if (successor != null) {
       if (successor.right != null) {
@@ -92,10 +81,10 @@ class AVLTree[A](implicit val ordering: Ordering[A]) extends mutable.SortedSet[A
         }
       }
     }
-    successor
+    Option(successor)
   }
 
-  def prev(node: AVLNode): AVLNode = {
+  def prev(node: AVLNode): Option[AVLNode] = {
     var predecessor = node
     if (predecessor != null) {
       if (predecessor.left != null) {
@@ -112,7 +101,7 @@ class AVLTree[A](implicit val ordering: Ordering[A]) extends mutable.SortedSet[A
         }
       }
     }
-    predecessor
+    Option(predecessor)
   }
 
   def insert(key: A): AVLNode = {
@@ -129,7 +118,7 @@ class AVLTree[A](implicit val ordering: Ordering[A]) extends mutable.SortedSet[A
     while (node != null) {
       parent = node
       cmp = ordering.compare(key, node.key)
-      if (cmp == 0) return null // duplicate
+      if (cmp == 0) return node // duplicate
       node = node.matchNextChild(cmp)
     }
 
@@ -165,7 +154,7 @@ class AVLTree[A](implicit val ordering: Ordering[A]) extends mutable.SortedSet[A
   }
 
   override def remove(key: A): Boolean = {
-    var node = findNode(key)
+    var node = findNode(key).orNull
     if (node == null) return false
 
     if (node.left != null) {
@@ -253,7 +242,7 @@ class AVLTree[A](implicit val ordering: Ordering[A]) extends mutable.SortedSet[A
     this
   }
 
-  override def contains(elem: A): Boolean = findNode(elem) != null
+  override def contains(elem: A): Boolean = findNode(elem).isDefined
 
   override def iterator: Iterator[A] = ???
 

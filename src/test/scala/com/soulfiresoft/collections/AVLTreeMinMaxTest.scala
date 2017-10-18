@@ -44,9 +44,9 @@ class AVLTreeMinMaxTest extends FlatSpec {
     assert(tree.maxNode().key == 5)
   }
 
-  it should "return null for maximum node if tree is empty" in {
+  it should "throw exception for maximum node if tree is empty" in {
     val tree = new AVLTree[Int]()
-    assert(tree.maxNode == null)
+    assertThrows[UnsupportedOperationException](tree.maxNode)
   }
 
   it should "return the minimum node in the tree" in {
@@ -59,9 +59,9 @@ class AVLTreeMinMaxTest extends FlatSpec {
     assert(tree.minNode().key == 1)
   }
 
-  it should "return null for minimum nodr if tree is empty" in {
+  it should "throw exception for minimum node if tree is empty" in {
     val tree = new AVLTree[Int]()
-    assert(tree.minNode == null)
+    assertThrows[UnsupportedOperationException](tree.minNode)
   }
 
 }
