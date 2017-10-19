@@ -46,4 +46,11 @@ class AVLTreeInsertTest extends FlatSpec {
     assert(tree.root.key == 2)
   }
 
+  it should "not insert duplicate keys" in {
+    val tree = new AVLTree[Int]()
+    tree.insert(1)
+    tree.insert(1)
+    assert(tree.size == 1)
+  }
+
 }
