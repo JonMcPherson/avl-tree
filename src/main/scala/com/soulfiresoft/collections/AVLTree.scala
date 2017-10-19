@@ -106,7 +106,7 @@ class AVLTree[A](implicit val ordering: Ordering[A]) extends mutable.SortedSet[A
 
   def insert(key: A): AVLNode = {
     if (root == null) {
-      _root = AVLNode(key)
+      _root = new AVLNode(key)
       _size += 1
       return root
     }
@@ -122,9 +122,9 @@ class AVLTree[A](implicit val ordering: Ordering[A]) extends mutable.SortedSet[A
       node = node.matchNextChild(cmp)
     }
 
-    val newNode = AVLNode(key, parent, null, null)
-    if (cmp <= 0) parent.left = newNode
-    else parent.right = newNode
+    val newNode = new AVLNode(key, parent)
+    if (cmp <= 0) parent._left = newNode
+    else parent._right = newNode
 
     while (parent != null) {
       cmp = ordering.compare(parent.key, key)
@@ -133,18 +133,16 @@ class AVLTree[A](implicit val ordering: Ordering[A]) extends mutable.SortedSet[A
 
       parent = parent.balanceFactor match {
         case -1 | 1 => parent.parent
-        case x if x < -1 => {
+        case x if x < -1 =>
           if (parent.right.balanceFactor == 1) rotateRight(parent.right)
           val newRoot = rotateLeft(parent)
           if (parent == root) _root = newRoot
           null
-        }
-        case x if x > 1 => {
+        case x if x > 1 =>
           if (parent.left.balanceFactor == -1) rotateLeft(parent.left)
           val newRoot = rotateRight(parent)
           if (parent == root) _root = newRoot
           null
-        }
         case _ => null
       }
     }
@@ -195,18 +193,16 @@ class AVLTree[A](implicit val ordering: Ordering[A]) extends mutable.SortedSet[A
       parent.balanceFactor += (if (parent.left == current) -1 else 1)
 
       current = parent.balanceFactor match {
-        case x if x < -1 => {
+        case x if x < -1 =>
           if (parent.right.balanceFactor == 1) rotateRight(parent.right)
           val newRoot = rotateLeft(parent)
           if (parent == root) _root = newRoot
           newRoot
-        }
-        case x if x > 1 => {
+        case x if x > 1 =>
           if (parent.left.balanceFactor == -1) rotateLeft(parent.left)
           val newRoot = rotateRight(parent)
           if (parent == root) _root = newRoot
           newRoot
-        }
         case _ => parent
       }
 
@@ -218,9 +214,9 @@ class AVLTree[A](implicit val ordering: Ordering[A]) extends mutable.SortedSet[A
 
     if (node.parent != null) {
       if (node.parent.left == node) {
-        node.parent.left = null
+        node.parent._left = null
       } else {
-        node.parent.right = null
+        node.parent._right = null
       }
     }
 
@@ -251,20 +247,20 @@ class AVLTree[A](implicit val ordering: Ordering[A]) extends mutable.SortedSet[A
 
   private def rotateLeft(node: AVLNode): AVLNode = {
     val rightNode = node.right
-    node.right = rightNode.left
-    if (node.right != null) node.right.parent = node
+    node._right = rightNode.left
+    if (node.right != null) node.right._parent = node
 
-    rightNode.parent = node.parent
+    rightNode._parent = node.parent
     if (rightNode.parent != null) {
       if (rightNode.parent.left == node) {
-        rightNode.parent.left = rightNode
+        rightNode.parent._left = rightNode
       } else {
-        rightNode.parent.right = rightNode
+        rightNode.parent._right = rightNode
       }
     }
 
-    node.parent = rightNode
-    rightNode.left = node
+    node._parent = rightNode
+    rightNode._left = node
 
     node.balanceFactor += 1
     if (rightNode.balanceFactor < 0) {
@@ -280,20 +276,20 @@ class AVLTree[A](implicit val ordering: Ordering[A]) extends mutable.SortedSet[A
 
   private def rotateRight(node: AVLNode): AVLNode = {
     val leftNode = node.left
-    node.left = leftNode.right
-    if (node.left != null) node.left.parent = node
+    node._left = leftNode.right
+    if (node.left != null) node.left._parent = node
 
-    leftNode.parent = node.parent
+    leftNode._parent = node.parent
     if (leftNode.parent != null) {
       if (leftNode.parent.left == node) {
-        leftNode.parent.left = leftNode
+        leftNode.parent._left = leftNode
       } else {
-        leftNode.parent.right = leftNode
+        leftNode.parent._right = leftNode
       }
     }
 
-    node.parent = leftNode
-    leftNode.right = node
+    node._parent = leftNode
+    leftNode._right = node
 
     node.balanceFactor -= 1
     if (leftNode.balanceFactor > 0) {
@@ -307,14 +303,25 @@ class AVLTree[A](implicit val ordering: Ordering[A]) extends mutable.SortedSet[A
     leftNode
   }
 
-  case class AVLNode(
-    private[AVLTree] var _key: A,
-    private[AVLTree] var parent: AVLNode = null,
-    private[collections] var left: AVLNode = null,
-    private[collections] var right: AVLNode = null,
-    private[AVLTree] var balanceFactor: Int = 0) {
+  class AVLNode private[AVLTree](k: A, p: AVLNode = null) {
+
+    private[AVLTree] var _key: A = k
 
     def key: A = _key
+
+    private[AVLTree] var _parent: AVLNode = p
+
+    def parent: AVLNode = _parent
+
+    private[AVLTree] var _left: AVLNode = _
+
+    def left: AVLNode = _left
+
+    private[AVLTree] var _right: AVLNode = _
+
+    def right: AVLNode = _right
+
+    private[AVLTree] var balanceFactor: Int = 0
 
     private[AVLTree] def selectNextChild(key: A): AVLNode = matchNextChild(ordering.compare(key, this.key))
 
