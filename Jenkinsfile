@@ -9,19 +9,13 @@ pipeline {
         }
         stage("Build") {
             steps {
-                sbt "clean package"
+                sh "sbt clean package"
             }
         }
         stage("Test") {
             steps {
-                sbt "test"
+                sh "sbt test"
             }
         }
     }
-}
-
-def sbt(def args) {
-    def sbtHome = tool 'default-sbt'
-
-    sh "${sbtHome}/bin/sbt -Dsbt.log.noformat=true ${args}"
 }
