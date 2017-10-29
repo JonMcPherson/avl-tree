@@ -8,12 +8,12 @@ pipeline {
     }
     stage('Build') {
       steps {
-        sh 'sbt -mem 256 clean package'
+        sh 'sbt clean package'
       }
     }
     stage('Test') {
       steps {
-        sh 'sbt -mem 256 test'
+        sh 'sbt test'
       }
     }
   }
