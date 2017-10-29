@@ -1,14 +1,22 @@
-#!groovy
+pipeline {
+    agent any
 
-node {
-    stage("Checkout") {
-        checkout scm
-    }
-    stage("Build") {
-        sbt "clean package"
-    }
-    stage("Test") {
-        sbt "test"
+    stages {
+        stage("Checkout") {
+            steps {
+                checkout scm
+            }
+        }
+        stage("Build") {
+            steps {
+                sbt "clean package"
+            }
+        }
+        stage("Test") {
+            steps {
+                sbt "test"
+            }
+        }
     }
 }
 
